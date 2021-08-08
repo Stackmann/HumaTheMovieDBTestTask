@@ -14,7 +14,9 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
     internal var curentPage = 0
     var attemptsLoadImages = [URL: Int]()
     let maxCountAttempt = 5
-    
+    var cacheLoadImages = [URL: UIImage]()
+    var totalPages = 0
+
     init(view: PlayingNowViewProtocol, networkService: ObtainMovies) {
         self.view = view
         self.networkService = networkService
@@ -22,6 +24,7 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
 
     func loadPlayingNowMovies() {
         curentPage += 1
+        if totalPages > 0 && totalPages < curentPage { return }
         networkService.getPlayingNowMovies(with: curentPage) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -29,9 +32,10 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
                 DispatchQueue.main.async {
                     self.view?.showAlert(with: error.localizedDescription)
                 }
-            case .success(let receivedMovies):
+            case .success(let response):
                 DispatchQueue.main.async {
-                    self.playingNowMovies += receivedMovies
+                    self.playingNowMovies += response.movies
+                    self.totalPages = response.totalPages
                     self.view?.moviesIsObtained()
                 }
             }
@@ -45,10 +49,11 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
                 print("Incorrect string for URL: \(Constants.movieImagePath + movie.posterPath)")
                 return
             }
-            //        if let image = cache[url] {
-            //            completion(.success(image))
-            //            return
-            //        }
+            
+            if let image = cacheLoadImages[url] {
+                cell.setLogo(with: image)
+                return
+            }
 
             if let countAttempt = attemptsLoadImages[url] {
                 if countAttempt >= maxCountAttempt {
@@ -59,19 +64,22 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
             } else {
                 attemptsLoadImages[url] = 1
             }
+            cell.logoURL = url
             
             networkService.getImageFromURL(with: movie.posterPath) { [weak cell, weak self] result in
+                guard let cell = cell else { return }
+                guard let self = self else { return }
                 switch result {
                 case .failure(let error):
                     print(error.localizedDescription) //???
-                    guard let cell = cell else { return }
-                    guard let self = self else { return }
                     self.loadImageForCell(by: index, to: cell)
                 case .success(let dataImage):
                     DispatchQueue.main.async {
                         if let image = UIImage(data: dataImage) {
-                            cell?.setLogo(with: image)
-                        }
+                            if cell.logoURL == url {
+                                cell.setLogo(with: image)
+                                self.cacheLoadImages[url] = image }
+                        } else { self.loadImageForCell(by: index, to: cell) }
                     }
                 }
 

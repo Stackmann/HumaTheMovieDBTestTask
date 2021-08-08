@@ -8,13 +8,13 @@
 import Foundation
 
 protocol ObtainMovies {
-    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<[Movie], Error>) -> Void)
+    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<Response, Error>) -> Void)
     func getImageFromURL(with urlString: String, completion: @escaping (Result<Data, Error>) -> Void)
 }
 
 class TheMovieDB: ObtainMovies {
     
-    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<[Movie], Error>) -> Void) {
+    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<Response, Error>) -> Void) {
         guard var urlComponents = URLComponents(string: Constants.playNowMoviesPath) else {
             completion(.failure(NetworkError.cantCreateURL))
             return
@@ -40,7 +40,7 @@ class TheMovieDB: ObtainMovies {
                 }
                 do {
                     let responseResult = try JSONDecoder().decode(Response.self, from: data)
-                    completion(.success(responseResult.movies))
+                    completion(.success(responseResult))
                 } catch {
                     print(error)
                     completion(.failure(error))
