@@ -11,6 +11,7 @@ class PlayingNowTableViewCell: UITableViewCell {
 
     @IBOutlet weak var logo: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
+    var logoURL: URL?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -18,5 +19,9 @@ class PlayingNowTableViewCell: UITableViewCell {
 
     func configure(with title: String) {
         titleLabel.text = title
+    }
+    
+    func setLogo(with image: UIImage) {
+        logo.image = image
     }
 }

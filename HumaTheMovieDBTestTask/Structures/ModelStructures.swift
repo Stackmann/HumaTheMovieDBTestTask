@@ -17,6 +17,6 @@ struct Movie: Hashable, Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case idMovie = "id"
         case name = "title"
-        case posterPath = "poster_path"
+        case posterPath = "backdrop_path"
     }
 }

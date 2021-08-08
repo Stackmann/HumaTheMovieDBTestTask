@@ -13,6 +13,7 @@ protocol PlayingNowViewModelProtocol: class {
     var curentPage: Int { get set }
     
     func loadPlayingNowMovies()
+    func loadImageForCell(by index: IndexPath, to cell: PlayingNowTableViewCell)
 }
 
 protocol PlayingNowViewProtocol: class {

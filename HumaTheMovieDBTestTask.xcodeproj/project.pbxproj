@@ -53,6 +53,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8452AC8F26BFD4EE00B9270C /* OtherSuppertedFiles */ = {
+			isa = PBXGroup;
+			children = (
+				8497B15A26BD9DFE0079A8C8 /* Assets.xcassets */,
+				8497B15C26BD9DFE0079A8C8 /* LaunchScreen.storyboard */,
+			);
+			path = OtherSuppertedFiles;
+			sourceTree = "<group>";
+		};
 		8497B14526BD9DFD0079A8C8 = {
 			isa = PBXGroup;
 			children = (
@@ -72,13 +81,12 @@
 		8497B15026BD9DFD0079A8C8 /* HumaTheMovieDBTestTask */ = {
 			isa = PBXGroup;
 			children = (
+				8497B15F26BD9DFE0079A8C8 /* Info.plist */,
 				8497B17326BDA4050079A8C8 /* Structures */,
 				8497B16E26BDA3440079A8C8 /* ViewModel */,
 				8497B16D26BD9F220079A8C8 /* Infrastructures */,
 				849DA9B226BEFD2100A7C3CE /* Application */,
-				8497B15A26BD9DFE0079A8C8 /* Assets.xcassets */,
-				8497B15C26BD9DFE0079A8C8 /* LaunchScreen.storyboard */,
-				8497B15F26BD9DFE0079A8C8 /* Info.plist */,
+				8452AC8F26BFD4EE00B9270C /* OtherSuppertedFiles */,
 			);
 			path = HumaTheMovieDBTestTask;
 			sourceTree = "<group>";

@@ -9,6 +9,7 @@ import Foundation
 
 protocol ObtainMovies {
     func getPlayingNowMovies(with page: Int, completion: @escaping (Result<[Movie], Error>) -> Void)
+    func getImageFromURL(with urlString: String, completion: @escaping (Result<Data, Error>) -> Void)
 }
 
 class TheMovieDB: ObtainMovies {
@@ -46,6 +47,25 @@ class TheMovieDB: ObtainMovies {
                 }
             }
         }.resume()
+    }
+    
+    func getImageFromURL(with urlString: String, completion: @escaping (Result<Data, Error>) -> Void) {
+        guard let url = URL(string: Constants.movieImagePath + urlString) else { completion(.failure(NetworkError.cantCreateURL))
+            return
+        }
+        
+        let task = URLSession.shared.downloadTask(with: url) { data, response, error in
+            
+            guard let data = data else { return }
+            do {
+                let imageData = try Data(contentsOf: data)
+                completion(.success(imageData))
+            } catch {
+                completion(.failure(NetworkError.cantRetriveData))
+            }
+        }
+        task.resume()
+
     }
     
     enum NetworkError: Error {
