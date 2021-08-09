@@ -19,6 +19,7 @@ class PlayingNowTableViewCell: UITableViewCell {
 
     func configure(with title: String) {
         titleLabel.text = title
+        logo.image = UIImage(named: "empty")
     }
     
     func setLogo(with image: UIImage) {
