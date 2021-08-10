@@ -51,7 +51,7 @@ extension PlayingNowViewController: UITableViewDataSource {
         cell.selectionStyle = .none
         if let viewModel = viewModel, viewModel.playingNowMovies.indices.contains(indexPath.row) {
             let movie = viewModel.playingNowMovies[indexPath.row]
-            cell.configure(with: movie.name)
+            cell.configure(with: movie.name, newIndex: indexPath.row)
             viewModel.loadImageForCell(by: indexPath, to: cell)
         }
         //next page load observ

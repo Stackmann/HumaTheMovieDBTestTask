@@ -12,9 +12,9 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
     let networkService: ObtainMovies
     var playingNowMovies = [Movie]()
     internal var curentPage = 0
-    var attemptsLoadImages = [URL: Int]()
+    var attemptsLoadImages = [Int: Int]()
     let maxCountAttempt = 5
-    var cacheLoadImages = [URL: UIImage]()
+    var cacheLoadImages = [Int: UIImage]()
     var totalPages = 0
 
     init(view: PlayingNowViewProtocol, networkService: ObtainMovies) {
@@ -43,28 +43,23 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
     }
     
     func loadImageForCell(by index: IndexPath, to cell: PlayingNowTableViewCell) {
-        if playingNowMovies.indices.contains(index.row) {
+        guard playingNowMovies.indices.contains(index.row) else { return }
             let movie = playingNowMovies[index.row]
-            guard let url = URL(string: Constants.movieImagePath + movie.posterPath) else {
-                print("Incorrect string for URL: \(Constants.movieImagePath + movie.posterPath)")
-                return
-            }
             
-            if let image = cacheLoadImages[url] {
+            if let image = cacheLoadImages[index.row] {
                 cell.setLogo(with: image)
                 return
             }
 
-            if let countAttempt = attemptsLoadImages[url] {
+            if let countAttempt = attemptsLoadImages[index.row] {
                 if countAttempt >= maxCountAttempt {
                     print("Achive max attempt count for: \(Constants.movieImagePath + movie.posterPath)")
                     return
                 }
-                attemptsLoadImages[url] = countAttempt + 1
+                attemptsLoadImages[index.row] = countAttempt + 1
             } else {
-                attemptsLoadImages[url] = 1
+                attemptsLoadImages[index.row] = 1
             }
-            cell.logoURL = url
             
             networkService.getImageFromURL(with: movie.posterPath) { [weak cell, weak self] result in
                 guard let cell = cell else { return }
@@ -76,14 +71,13 @@ class PlayingNowViewModel: PlayingNowViewModelProtocol {
                 case .success(let dataImage):
                     DispatchQueue.main.async {
                         if let image = UIImage(data: dataImage) {
-                            if cell.logoURL == url {
+                            if cell.index == index.row {
                                 cell.setLogo(with: image)
-                                self.cacheLoadImages[url] = image }
+                                self.cacheLoadImages[index.row] = image }
                         } else { self.loadImageForCell(by: index, to: cell) }
                     }
                 }
 
             }
-        }
     }
 }
