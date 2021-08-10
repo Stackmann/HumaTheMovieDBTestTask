@@ -8,15 +8,14 @@
 import Foundation
 
 struct Movie: Hashable, Codable, Identifiable {
-    var id = UUID()
-    
-    var idMovie: Int
-    var name: String
-    var posterPath: String
-    
     enum CodingKeys: String, CodingKey {
         case idMovie = "id"
         case name = "title"
         case posterPath = "backdrop_path"
     }
+    
+    let id = UUID()
+    let idMovie: Int
+    let name: String
+    let posterPath: String
 }

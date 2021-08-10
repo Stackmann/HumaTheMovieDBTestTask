@@ -7,10 +7,10 @@
 
 import UIKit
 
-class PlayingNowTableViewCell: UITableViewCell {
+final class PlayingNowTableViewCell: UITableViewCell {
 
-    @IBOutlet weak var logo: UIImageView!
-    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet private weak var logo: UIImageView!
+    @IBOutlet private weak var titleLabel: UILabel!
     var index: Int?
     
     override func awakeFromNib() {

@@ -9,8 +9,8 @@ import XCTest
 import UIKit
 @testable import HumaTheMovieDBTestTask
 
-class MockNetworking: ObtainMovies {
-    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<Response, Error>) -> Void) {
+class MockNetworking: MovieObtainable {
+    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<MoviewResponse, Error>) -> Void) {
         
         var movies = [Movie]()
         switch page {
@@ -28,7 +28,7 @@ class MockNetworking: ObtainMovies {
             movies.append(movie)
         }
         
-        let response = Response(page: page, movies: movies, totalResults: 1000, totalPages: 50)
+        let response = MoviewResponse(page: page, movies: movies, totalResults: 1000, totalPages: 50)
         DispatchQueue.global().sync {
             completion(.success(response))
         }

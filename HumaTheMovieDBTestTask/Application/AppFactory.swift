@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol Factory {
+protocol AppFactoryProtocol {
     static func createMainView() -> UIViewController
 }
 
-class MainFactory: Factory {
+final class AppFactory: AppFactoryProtocol {
     static func createMainView() -> UIViewController {
         let mainVC = PlayingNowViewController()
         let viewModel = PlayingNowViewModel(view: mainVC, networkService: TheMovieDB())

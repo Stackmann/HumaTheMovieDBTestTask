@@ -7,10 +7,10 @@
 import UIKit
 
 protocol PlayingNowViewModelProtocol: class {
-    var view: PlayingNowViewProtocol? { get set }
+    var view: PlayingNowViewProtocol? { get }
     
-    var playingNowMovies: [Movie] { get set }
-    var curentPage: Int { get set }
+    var playingNowMovies: [Movie] { get }
+    var curentPage: Int { get }
     
     func loadPlayingNowMovies()
     func loadImageForCell(by index: IndexPath, to cell: PlayingNowTableViewCell)

@@ -7,26 +7,30 @@
 
 import UIKit
 
-class PlayingNowViewController: UIViewController, PlayingNowViewProtocol {
+final class PlayingNowViewController: UIViewController, PlayingNowViewProtocol {
 
-    var viewModel: PlayingNowViewModelProtocol?
-    @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var spinner: UIActivityIndicatorView!
+    enum Constants {
+        static let cellNibName = "PlayingNowTableViewCell"
+        static let cellIdentifier = "cell"
+    }
     
-    //MARK: Life cycle metods
+    var viewModel: PlayingNowViewModelProtocol?
+    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var spinner: UIActivityIndicatorView!
+    
+    // MARK: - Life cycle metods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
-        tableView.register(UINib(nibName: "PlayingNowTableViewCell", bundle: nil), forCellReuseIdentifier: "cell")
-
+        tableView.register(UINib(nibName: Constants.cellNibName, bundle: nil), forCellReuseIdentifier: Constants.cellIdentifier)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         viewModel?.loadPlayingNowMovies()
     }
     
-    //MARK: own metods
+    // MARK: - own metods
     
     func moviesIsObtained() {
         tableView.reloadData()
@@ -38,10 +42,12 @@ class PlayingNowViewController: UIViewController, PlayingNowViewProtocol {
     }
 }
 
+// MARK: - UITableViewDataSource
+
 extension PlayingNowViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.playingNowMovies.count ?? 0
+        viewModel?.playingNowMovies.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

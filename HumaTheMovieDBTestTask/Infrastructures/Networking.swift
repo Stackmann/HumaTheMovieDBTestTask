@@ -7,14 +7,20 @@
 
 import Foundation
 
-protocol ObtainMovies {
-    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<Response, Error>) -> Void)
+protocol MovieObtainable {
+    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<MoviewResponse, Error>) -> Void)
     func getImageFromURL(with urlString: String, completion: @escaping (Result<Data, Error>) -> Void)
 }
 
-class TheMovieDB: ObtainMovies {
+final class TheMovieDB: MovieObtainable {
     
-    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<Response, Error>) -> Void) {
+    enum NetworkError: Error {
+        case cantCreateURL
+        case cantRetriveData
+    }
+    
+    func getPlayingNowMovies(with page: Int, completion: @escaping (Result<MoviewResponse, Error>) -> Void) {
+
         guard var urlComponents = URLComponents(string: Constants.playNowMoviesPath) else {
             completion(.failure(NetworkError.cantCreateURL))
             return
@@ -28,23 +34,21 @@ class TheMovieDB: ObtainMovies {
         }
         
         URLSession.shared.dataTask(with: url) { (data, response, error) in
-            guard (response as? HTTPURLResponse) != nil else {
-                return
-            }
+            guard (response as? HTTPURLResponse) != nil else { return }
             if let error = error {
                 completion(.failure(error))
-            } else {
-                guard let data = data else {
-                    completion(.failure(NetworkError.cantRetriveData))
-                    return
-                }
-                do {
-                    let responseResult = try JSONDecoder().decode(Response.self, from: data)
-                    completion(.success(responseResult))
-                } catch {
-                    print(error)
-                    completion(.failure(error))
-                }
+                return
+            }
+            guard let data = data else {
+                completion(.failure(NetworkError.cantRetriveData))
+                return
+            }
+            do {
+                let responseResult = try JSONDecoder().decode(MoviewResponse.self, from: data)
+                completion(.success(responseResult))
+            } catch {
+                print(error)
+                completion(.failure(error))
             }
         }.resume()
     }
@@ -54,8 +58,7 @@ class TheMovieDB: ObtainMovies {
             return
         }
         
-        let task = URLSession.shared.downloadTask(with: url) { data, response, error in
-            
+        URLSession.shared.downloadTask(with: url) { data, response, error in
             guard let data = data else { return }
             do {
                 let imageData = try Data(contentsOf: data)
@@ -63,28 +66,21 @@ class TheMovieDB: ObtainMovies {
             } catch {
                 completion(.failure(NetworkError.cantRetriveData))
             }
-        }
-        task.resume()
-
-    }
-    
-    enum NetworkError: Error {
-        case cantCreateURL
-        case cantRetriveData
+        }.resume()
     }
 }
 
-struct Response: Codable {
-    var page: Int
-    var movies: [Movie]
-    var totalResults: Int
-    var totalPages: Int
-    
+struct MoviewResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case page
         case totalResults = "total_results"
         case totalPages = "total_pages"
         case movies = "results"
     }
+
+    var page: Int
+    var movies: [Movie]
+    var totalResults: Int
+    var totalPages: Int
 }
 
