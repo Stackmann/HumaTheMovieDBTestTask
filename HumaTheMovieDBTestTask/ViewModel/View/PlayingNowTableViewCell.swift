@@ -21,6 +21,8 @@ final class PlayingNowTableViewCell: UITableViewCell {
         titleLabel.text = title
         index = newIndex
         logo.image = UIImage(named: "empty")
+        selectionStyle = .none
+
     }
     
     func setLogo(with image: UIImage) {

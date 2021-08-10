@@ -42,40 +42,42 @@ final class PlayingNowViewModel: PlayingNowViewModelProtocol {
         }
     }
     
-    func loadImageForCell(by index: IndexPath, to cell: PlayingNowTableViewCell) {
+    func loadImageForCell(by index: IndexPath, completion: @escaping (Int, UIImage) -> ()) {
         guard playingNowMovies.indices.contains(index.row) else { return }
         let movie = playingNowMovies[index.row]
         
         if let image = cacheLoadImages[index.row] {
-            cell.setLogo(with: image)
+            completion(index.row, image)
             return
         }
         
-        if let countAttempt = attemptsLoadImages[index.row] {
-            if countAttempt >= maxCountAttempt {
-                print("Achive max attempt count for: \(Constants.movieImagePath + movie.posterPath)")
-                return
-            }
-            attemptsLoadImages[index.row] = countAttempt + 1
-        } else {
-            attemptsLoadImages[index.row] = 1
-        }
+        if increaseCountAttemptGettingImage(of: index.row, path: movie.posterPath) {return}
         
-        networkService.getImageFromURL(with: movie.posterPath) { [weak cell, weak self] result in
-            guard let cell = cell else { return }
+        networkService.getImageFromURL(with: movie.posterPath) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .failure(let error):
                 print(error.localizedDescription) //???
-                self.loadImageForCell(by: index, to: cell)
+                self.loadImageForCell(by: index, completion: completion)
             case .success(let dataImage):
                 DispatchQueue.main.async {
                     if let image = UIImage(data: dataImage) {
-                        if cell.index == index.row { cell.setLogo(with: image) }
+                        completion(index.row, image)
                         self.cacheLoadImages[index.row] = image
-                    } else { self.loadImageForCell(by: index, to: cell) }
+                    } else { self.loadImageForCell(by: index, completion: completion) }
                 }
             }
         }
+    }
+    
+    private func increaseCountAttemptGettingImage(of index: Int, path: String) -> Bool {
+        guard let countAttempt = attemptsLoadImages[index] else {
+            attemptsLoadImages[index] = 1
+            return false }
+        guard countAttempt < maxCountAttempt else {
+            attemptsLoadImages[index] = countAttempt + 1
+            return false }
+        print("Achive max attempt count for: \(Constants.movieImagePath + path)")
+        return true
     }
 }

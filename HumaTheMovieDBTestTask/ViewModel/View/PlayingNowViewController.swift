@@ -52,17 +52,19 @@ extension PlayingNowViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! PlayingNowTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: Constants.cellIdentifier, for: indexPath) as! PlayingNowTableViewCell
         
-        cell.selectionStyle = .none
-        if let viewModel = viewModel, viewModel.playingNowMovies.indices.contains(indexPath.row) {
-            let movie = viewModel.playingNowMovies[indexPath.row]
-            cell.configure(with: movie.name, newIndex: indexPath.row)
-            viewModel.loadImageForCell(by: indexPath, to: cell)
+        guard let viewModel = viewModel, viewModel.playingNowMovies.indices.contains(indexPath.row) else { return cell }
+        let movie = viewModel.playingNowMovies[indexPath.row]
+        cell.configure(with: movie.name, newIndex: indexPath.row)
+        viewModel.loadImageForCell(by: indexPath) { [weak cell] index, image in
+            guard cell?.index == index else { return }
+            cell?.setLogo(with: image)
         }
+        
         //next page load observ
         let endIndexArray = [indexPath.row + 1, indexPath.row + 2, indexPath.row + 3]
-        if let viewModel = viewModel, endIndexArray.contains(viewModel.playingNowMovies.count) {
+        if endIndexArray.contains(viewModel.playingNowMovies.count) {
             viewModel.loadPlayingNowMovies()
         }
 
